@@ -1,0 +1,37 @@
+﻿namespace GildedRoseKata;
+
+public class BackstagePassesUpdater : IItemUpdater
+{
+    private readonly Item item;
+
+    public BackstagePassesUpdater(Item item)
+    {
+        this.item = item;
+    }
+
+    public void UpdateQuality()
+    {
+        if (item.SellIn < 0)
+        {
+            item.Quality = 0;
+        }
+        else if (item.Quality < 50)
+        {
+            item.Quality++;
+
+            if (item.SellIn < 10 && item.Quality < 50)
+            {
+                item.Quality++;
+            }
+            if (item.SellIn < 5 && item.Quality < 50)
+            {
+                item.Quality++;
+            }
+        }
+    }
+
+    public void UpdateSellIn()
+    {
+        item.SellIn--;
+    }
+}
