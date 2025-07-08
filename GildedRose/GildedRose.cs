@@ -1,4 +1,6 @@
-﻿namespace GildedRoseKata;
+﻿using System.Security.Cryptography.X509Certificates;
+
+namespace GildedRoseKata;
 
 public class GildedRose
 {
@@ -7,6 +9,79 @@ public class GildedRose
     {
         this.Items = Items;
     }
+    // UpdateAgedBrie - Aged Brie 
+    // UpdateBackstagePasses - Backstage Passes
+    // Update
+
+    private void UpdateNewQuality()
+    {
+        foreach (var item in Items)
+        {
+            switch (item.Name)
+            {
+                case "Aged Brie":
+                    UpdateAgedBrie(item);
+                    break;
+                case "Backstage passes to a TAFKAL80ETC concert":
+                    UpdateBackstagePasses(item);
+                    break;
+                case "Sulfuras, Hand of Ragnaros":
+                    // Sulfuras does not need to be updated
+                    break;
+                default:
+                    UpdateDefaultItem(item);
+                    break;
+
+            }
+        }
+    }
+    private void UpdateDefaultItem(Item item)
+    {
+        if (item.Quality > 0)
+        {
+            item.Quality -= 1;
+        }
+
+        item.SellIn -= 1;
+
+        if (item.SellIn < 0)
+        {
+            if (item.Quality > 0)
+            {
+                item.Quality -= 1;
+            }
+        }
+    }
+    public void UpdateBackstagePasses(Item item)
+    {
+        if (item.SellIn < 11)
+        {
+            if (item.Quality < 50)
+            {
+                item.Quality = item.Quality + 1;
+            }
+        }
+
+        if (item.SellIn < 6)
+        {
+            if (item.Quality < 50)
+            {
+                item.Quality = item.Quality + 1;
+            }
+        }
+
+    }
+
+    public void UpdateAgedBrie(Item item)
+    {
+        if (item.Quality < 50)
+        {
+            item.Quality = item.Quality + 1;
+
+
+        }
+    }
+
 
     public void UpdateQuality()
     {
@@ -26,7 +101,7 @@ public class GildedRose
             {
                 if (Items[i].Quality < 50)
                 {
-                    Items[i].Quality += 1;
+                    Items[i].Quality = Items[i].Quality + 1;
 
                     if (Items[i].Name == "Backstage passes to a TAFKAL80ETC concert")
                     {
@@ -34,7 +109,7 @@ public class GildedRose
                         {
                             if (Items[i].Quality < 50)
                             {
-                                Items[i].Quality += 1;
+                                Items[i].Quality = Items[i].Quality + 1;
                             }
                         }
 
@@ -42,7 +117,7 @@ public class GildedRose
                         {
                             if (Items[i].Quality < 50)
                             {
-                                Items[i].Quality += 1;
+                                Items[i].Quality = Items[i].Quality + 1;
                             }
                         }
                     }
@@ -51,7 +126,7 @@ public class GildedRose
 
             if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
             {
-                Items[i].SellIn -= 1;
+                Items[i].SellIn = Items[i].SellIn - 1;
             }
 
             if (Items[i].SellIn < 0)
@@ -64,20 +139,20 @@ public class GildedRose
                         {
                             if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
                             {
-                                Items[i].Quality -= 1;
+                                Items[i].Quality = Items[i].Quality - 1;
                             }
                         }
                     }
                     else
                     {
-                        Items[i].Quality -= Items[i].Quality;
+                        Items[i].Quality = Items[i].Quality - Items[i].Quality;
                     }
                 }
                 else
                 {
                     if (Items[i].Quality < 50)
                     {
-                        Items[i].Quality += 1;
+                        Items[i].Quality = Items[i].Quality + 1;
                     }
                 }
             }
