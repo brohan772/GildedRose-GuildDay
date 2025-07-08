@@ -1,5 +1,120 @@
 ﻿namespace GildedRoseKata;
 
+public interface IUpdateItem
+{
+    void UpdateQuality();
+    void UpdateSellIn();
+}
+
+public class AgedBrieUpdater : IUpdateItem
+{
+    private readonly Item item;
+
+    public AgedBrieUpdater(Item item)
+    {
+        this.item = item;
+    }
+
+    public void UpdateQuality()
+    {
+        if (item.Quality < 50)
+        {
+            item.Quality++;
+            if (item.SellIn < 0 && item.Quality < 50)
+            {
+                item.Quality++;
+            }
+        }
+    }
+
+    public void UpdateSellIn()
+    {
+        item.SellIn--;
+    }
+}
+
+public class BackstagePassesUpdater : IUpdateItem
+{
+    private readonly Item item;
+
+    public BackstagePassesUpdater(Item item)
+    {
+        this.item = item;
+    }
+
+    public void UpdateQuality()
+    {
+        if (item.SellIn < 0)
+        {
+            item.Quality = 0;
+        }
+        else if (item.Quality < 50)
+        {
+            item.Quality++;
+
+            if (item.SellIn < 10 && item.Quality < 50)
+            {
+                item.Quality++;
+            }
+            if (item.SellIn < 5 && item.Quality < 50)
+            {
+                item.Quality++;
+            }
+        }
+    }
+
+    public void UpdateSellIn()
+    {
+        item.SellIn--;
+    }
+}
+
+public class ConjuredItemUpdater : IUpdateItem
+{
+    private readonly Item item;
+
+    public ConjuredItemUpdater(Item item)
+    {
+        this.item = item;
+    }
+
+    public void UpdateQuality()
+    {
+        int degradation = 2;
+        if (item.SellIn < 0)
+        {
+            degradation *= 2;
+        }
+
+        item.Quality = Math.Max(0, item.Quality - degradation);
+    }
+
+    public void UpdateSellIn()
+    {
+        item.SellIn--;
+    }
+}
+public class NormalItemUpdater : IUpdateItem
+{
+    private readonly Item item;
+
+    public NormalItemUpdater(Item item)
+    {
+        this.item = item;
+    }
+
+    public void UpdateQuality()
+    {
+        int degradation = item.SellIn < 0 ? 2 : 1;
+        item.Quality = System.Math.Max(0, item.Quality - degradation);
+    }
+
+    public void UpdateSellIn()
+    {
+        item.SellIn--;
+    }
+}
+
 public class GildedRose
 {
     private readonly IList<Item> items;
@@ -18,75 +133,27 @@ public class GildedRose
                 continue;
             }
 
-            item.SellIn--;
+            var updater = GetUpdater(item);
+            updater.UpdateQuality();
+            updater.UpdateSellIn();
+        }
+    }
+
+    private IUpdateItem GetUpdater(Item item)
+    {
+
 
             switch (item.Name)
             {
                 case "Aged Brie":
-                    UpdateAgedBrie(item);
-                    break;
+                    return new AgedBrieUpdater(item);
                 case var name when name.StartsWith("Backstage passes"):
-                    UpdateBackstagePasses(item);
-                    break;
+                    return new BackstagePassesUpdater(item);
                 case var name when name.StartsWith("Conjured"):
-                    UpdateConjuredItem(item);
-                    break;
+                    return new ConjuredItemUpdater(item);
                 default:
-                    UpdateNormalItem(item);
-                    break;
-            }
-        }
-    }
-
-    private void UpdateAgedBrie(Item item)
-    {
-        if (item.Quality < 50)
-        {
-            item.Quality++;
-            if (item.SellIn < 0 && item.Quality < 50)
-            {
-                item.Quality++;
-            }
-        }
-    }
-
-    private void UpdateBackstagePasses(Item item)
-    {
-        if (item.SellIn < 0)
-        {
-            item.Quality = 0;
-        }
-        else if (item.Quality < 50)
-        {
-            item.Quality++;
-
-            if (item.SellIn < 10 && item.Quality < 50)
-            {
-                item.Quality++;
+                    return new NormalItemUpdater(item);
             }
 
-            if (item.SellIn < 5 && item.Quality < 50)
-            {
-                item.Quality++;
-            }
-        }
-    }
-
-    private void UpdateConjuredItem(Item item)
-    {
-        int degradation = 2;
-        if (item.SellIn < 0)
-        {
-            degradation *= 2;
-        }
-
-        item.Quality = Math.Max(0, item.Quality - degradation);
-
-    }
-
-    private void UpdateNormalItem(Item item)
-    {
-        int degradation = item.SellIn < 0 ? 2 : 1;
-        item.Quality = Math.Max(0, item.Quality - degradation);
     }
 }
