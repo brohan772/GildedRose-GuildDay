@@ -9,7 +9,7 @@ public class GildedRoseTest
     {
         List<Item> items = [ new Item { Name = "foo", SellIn = 0, Quality = 0 } ];
         GildedRose app = new(items);
-        app.UpdateQuality();
+        app.UpdateNewQuality();
         Assert.Equal("fixme", items[0].Name);
     }
 }
