@@ -2,103 +2,91 @@
 
 public class GildedRose
 {
-    IList<Item> Items;
-    public GildedRose(IList<Item> Items)
-    {
-        this.Items = Items;
-    }
-    // UpdateAgedBrie - Aged Brie 
-    // UpdateBackstagePasses - Backstage Passes
-    // Update
+    private readonly IList<Item> items;
 
-    public void UpdateNewQuality()
+    public GildedRose(IList<Item> items)
     {
-        foreach (var item in Items)
+        this.items = items;
+    }
+
+    public void UpdateQuality()
+    {
+        foreach (var item in items)
         {
+            if (item.Name == "Sulfuras, Hand of Ragnaros")
+            {
+                continue;
+            }
+
+            item.SellIn--;
+
             switch (item.Name)
             {
                 case "Aged Brie":
                     UpdateAgedBrie(item);
                     break;
-                case "Backstage passes to a TAFKAL80ETC concert":
+                case var name when name.StartsWith("Backstage passes"):
                     UpdateBackstagePasses(item);
                     break;
-                case "Sulfuras, Hand of Ragnaros":
-                    // Sulfuras does not need to be updated
+                case var name when name.StartsWith("Conjured"):
+                    UpdateConjuredItem(item);
                     break;
                 default:
-                    if (item.Name.StartsWith("Conjured"))
-                        UpdateConjuredItem(item);
-                    else
-                        UpdateDefaultItem(item);
+                    UpdateNormalItem(item);
                     break;
+            }
+        }
+    }
+
+    private void UpdateAgedBrie(Item item)
+    {
+        if (item.Quality < 50)
+        {
+            item.Quality++;
+            if (item.SellIn < 0 && item.Quality < 50)
+            {
+                item.Quality++;
+            }
+        }
+    }
+
+    private void UpdateBackstagePasses(Item item)
+    {
+        if (item.SellIn < 0)
+        {
+            item.Quality = 0;
+        }
+        else if (item.Quality < 50)
+        {
+            item.Quality++;
+
+            if (item.SellIn < 10 && item.Quality < 50)
+            {
+                item.Quality++;
+            }
+
+            if (item.SellIn < 5 && item.Quality < 50)
+            {
+                item.Quality++;
             }
         }
     }
 
     private void UpdateConjuredItem(Item item)
     {
-        int degrade = item.SellIn > 0 ? 2 : 4;
-        item.Quality = Math.Max(0, item.Quality - degrade);
-        item.SellIn -= 1;
-    }
-
-    private void UpdateDefaultItem(Item item)
-    {
-        if (item.Quality > 0)
-        {
-            item.Quality -= 1;
-        }
-
-        item.SellIn -= 1;
-
+        int degradation = 2;
         if (item.SellIn < 0)
         {
-            if (item.Quality > 0)
-            {
-                item.Quality -= 1;
-            }
+            degradation *= 2;
         }
+
+        item.Quality = Math.Max(0, item.Quality - degradation);
+
     }
-    public void UpdateBackstagePasses(Item item)
+
+    private void UpdateNormalItem(Item item)
     {
-        if (item.SellIn > 0)
-        {
-            if (item.Quality < 50)
-            {
-                item.Quality += 1;
-                if (item.SellIn <= 10 && item.Quality < 50)
-                {
-                    item.Quality += 1;
-                }
-                if (item.SellIn <= 5 && item.Quality < 50)
-                {
-                    item.Quality += 1;
-                }
-            }
-        }
-        else
-        {
-            item.Quality = 0;
-        }
-
-        item.SellIn -= 1;
+        int degradation = item.SellIn < 0 ? 2 : 1;
+        item.Quality = Math.Max(0, item.Quality - degradation);
     }
-
-
-    public void UpdateAgedBrie(Item item)
-    {
-        if (item.Quality < 50)
-        {
-            item.Quality += 1;
-        }
-
-        item.SellIn -= 1;
-
-        if (item.SellIn < 0 && item.Quality < 50)
-        {
-            item.Quality += 1;
-        }
-    }
-
 }
